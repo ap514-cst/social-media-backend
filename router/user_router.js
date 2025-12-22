@@ -1,5 +1,5 @@
 const express=require("express");
-const {register,login}=require("../controller/user_controller");
+const {register,login, findUser}=require("../controller/user_controller");
 
 const userRouter=express.Router();
 
@@ -10,5 +10,6 @@ userRouter.post("/register",register);
 //login route..
 
 userRouter.post("/login",login);
-
+//get route..
+userRouter.get("/get",findUser)
 module.exports=userRouter

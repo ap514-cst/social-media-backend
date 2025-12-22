@@ -44,8 +44,25 @@ const login = async (req, res) => {
         res.status(500).json({ message: "Server error" })
     }
 }
+const findUser=async(req,res)=>{
+    try {
+        const findUser=await userModel.find()
+        if(findUser.length===0){
+            return res.status(404).json("no data exjist")
+        }else{
+            res.status(202).json({
+                message:"Data",
+                findUser
+            })
+        }
+    } catch (error) {
+         console.log(error);
+        res.status(500).json({ message: "Server error" })
+    }
+}
 
 module.exports = {
     register,
-    login
+    login,
+    findUser
 }
