@@ -1,68 +1,80 @@
+// controllers/authController.js
+const User = require("../model/user.model");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
-const userModel = require("../model/user.model");
-
-//create new user..
-//register controller..
+// 🔹 REGISTER
 const register = async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
-        const existingUser = await userModel.find({ email });
-        if (!existingUser) {
-            return res.status(400).json({ message: "User already exists" })
-        } else {
-            const newUser = new userModel({ name, email, password });
-            const User = await newUser.save();
-            if (User) {
-                res.status(201).json({ message: "User registerd successfully", User })
-            } else {
-                res.status(400).json({ message: "Failed to register user" })
-            }
-        }
+  try {
+    const { name, email, password } = req.body;
 
-
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Server error" })
-
+    // check user
+    const userExist = await User.findOne({ email });
+    if (userExist) {
+      return res.status(400).json({ message: "User already exists" });
     }
-}
 
-//login controller..
+    // password hash
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword
+    });
+
+    res.status(201).json({
+      message: "User registered successfully",
+      user
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// controllers/authController.js
+
+// 🔹 LOGIN
 const login = async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const user = await userModel.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: "User not found" })
-        } if (user.password !== password) {
-            return res.status(400).json({ message: "password is incorrect" })
-        } 
-          return  res.status(200).json({ message: "login successful" })
-        
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: "Server error" })
-    }
-}
-const findUser=async(req,res)=>{
-    try {
-        const findUser=await userModel.find()
-        if(findUser.length===0){
-            return res.status(404).json("no data exjist")
-        }else{
-            res.status(202).json({
-                message:"Data",
-                findUser
-            })
-        }
-    } catch (error) {
-         console.log(error);
-        res.status(500).json({ message: "Server error" })
-    }
-}
+  try {
+    const { email, password } = req.body;
 
-module.exports = {
-    register,
-    login,
-    findUser
-}
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    // password match
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid password" });
+    }
+
+    // generate token
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRETS,
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { register, login };
+
+
+

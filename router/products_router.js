@@ -1,5 +1,5 @@
 const express=require("express");
-const upload=require("../middlware/uploadMiddleware")
+//const upload=require("../middlware/uploadMiddleware")
 const {getProducts, postProduct, deletedProduct, search}=require("../controller/products_controller")
 const route=express.Router()
 
@@ -8,7 +8,7 @@ const route=express.Router()
 
 
 route.get("/get",getProducts)
-route.post("/post",upload.single("image"),postProduct)
+route.post("/post",postProduct)
 route.delete("/delete/:id",deletedProduct)
 route.get("/search/:key",search)
 module.exports=route;
