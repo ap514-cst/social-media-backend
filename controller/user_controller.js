@@ -2,6 +2,7 @@
 const User = require("../model/user.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const {Jwt_secret}=require("../key")
 
 // 🔹 REGISTER
 const register = async (req, res) => {
@@ -15,19 +16,24 @@ const register = async (req, res) => {
     }
 
     // password hash
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword
-    });
+    bcrypt.hash(password, 10).then((hashedPassword) => {
+      const user =new User({
+        name,
+        email,
+        password: hashedPassword
+      });
 
-    res.status(201).json({
-      message: "User registered successfully",
-      user
-    });
+    const newUser= user.save()
+    if(newUser){
+      res.status(202).json({message:"data save"})
+    }else{
+      res.status(400).json({message:"data save faild"})
+    }
+
+    })
+
+
 
   } catch (error) {
     res.status(500).json({ message: "Server error" });
@@ -38,7 +44,7 @@ const register = async (req, res) => {
 
 // 🔹 LOGIN
 const login = async (req, res) => {
-  try {
+ try {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
@@ -46,31 +52,27 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "User not found" });
     }
 
-    // password match
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password" });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // generate token
     const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRETS,
-      { expiresIn: "7d" }
+      { _id: user._id },   // ✅ IMPORTANT
+      Jwt_secret,
+      { expiresIn: "1h" }
     );
+
+    const { password: _, ...safeUser } = user._doc;
 
     res.status(200).json({
       message: "Login successful",
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email
-      }
+      user: safeUser
     });
 
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 

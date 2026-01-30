@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+
 const ProductModel = require("../model/products.model")
-const Product = mongoose.model("products", ProductModel)
+
 
 
 
@@ -27,29 +27,29 @@ const getProducts = async (req, res) => {
 
 //postProduct.
 const postProduct = async (req, res) => {
-    try {
-        const { title, description } = req.body;
-        if (!req.file) {
-            return res.status(400).json({ message: "Image is requied" })
+   try {
+        const {title, description}=req.body;
+        if(!title || !description){
+            return res.status(404).json({message:"Please fill the required"})
         }
-       
-
-        const newPost = new Product({
+        req.user
+        const newPost=new ProductModel({
             title,
-            description,
-            image
+             description,
+             postedBy:req.user
         })
-
-        await newPost.save();
-        res.status(201).json({
-            message: "Post created successfully",
-            post: newPost
-        });
-    } catch (error) {
-        console.log("error:", error.message);
-        res.status(500).json({ message: "Server Error" });
-    }
+        const UserPost=await newPost.save()
+        if(UserPost){
+            res.status(202).json({message:"done",UserPost})
+        }else{
+            res.status(404).json("post faild")
+        }
+   } catch (error) {
+        console.log("error",error.message);
+        res.status(500).json("internal server is down")
+   }
 }
+
 //deleted Product..
 
 const deletedProduct = async (req, res) => {
