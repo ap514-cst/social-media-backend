@@ -18,7 +18,7 @@ const productSchema = new mongoose.Schema({
         required: true
 
     },
-    likes: [{ type: ObjectId, ref: "User" }],
+    likes: [{ type: ObjectId, ref: "User" ,default:[]}],
     comments: [
         {
             text: {
@@ -29,12 +29,9 @@ const productSchema = new mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "User"
             },
-            createdAt: {
-                type: Date,
-                default: Date.now
-            }
+            
         }
-    ],
+    ],default:[],
 
     postedBy: {
         type: ObjectId,
