@@ -10,6 +10,6 @@ const route=express.Router()
 
 route.get("/get",getProducts)
 route.post("/post",loginAuth,postProduct)
-route.delete("/delete/:id",deletedProduct)
+route.delete("/delete/:id",loginAuth,deletedProduct)
 route.get("/search/:key",search)
 module.exports=route;

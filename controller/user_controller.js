@@ -64,7 +64,8 @@ const login = async (req, res) => {
     );
 
     const { password: _, ...safeUser } = user._doc;
-
+    console.log(token,user)
+    
     res.status(200).json({
       message: "Login successful",
       token,

@@ -11,13 +11,13 @@ module.exports = async (req, res, next) => {
     }
 
     // Authorization: Bearer token
-    const token = authorization.replace("Bearer ", "");
+    const token = req.headers.authorization.replace("Bearer ", "");
 
     const payload = jwt.verify(token, Jwt_secret);
 
-    const user = await User.findById(payload. _id);
+    const user = await User.findById(payload._id);
     console.log(user);
-    
+
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
