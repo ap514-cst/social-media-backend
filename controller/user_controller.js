@@ -2,7 +2,8 @@
 const User = require("../model/user.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const {Jwt_secret}=require("../key")
+const {Jwt_secret}=require("../key");
+const { Router } = require("express");
 
 // 🔹 REGISTER
 const register = async (req, res) => {
@@ -77,7 +78,30 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+// search user by name ..
+const searchUser= async(req,res)=>{
+  try {
+    const keyword=req.query.search;
+
+    if(!keyword){
+      return res.json([])
+    }
+    const result=await User.find({
+      $or:[
+        {name:{$regex:keyword,$options:"i"}}
+      ]
+    }).select("_id name")
+    .limit(5)
+
+    res.json(result)
+    
+  } catch (error) {
+    console.log(error);
+    
+  }
+}
+
+module.exports = { register, login,searchUser };
 
 
 
