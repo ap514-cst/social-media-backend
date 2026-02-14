@@ -8,6 +8,7 @@ const profileRouter=require("./router/profile_router")
 const likesRouter=require("./router/likes_router")
 const commentRouter=require("./router/comment_router")
 const fileUpload=require("express-fileupload")
+const searchRouter=require("./router/search_router")
 const app=express();
 
 
@@ -28,7 +29,7 @@ app.use("/api/products",productRouter)
 app.use("/api/user",profileRouter)
 app.use("/api/user",likesRouter)
 app.use("/api/user",commentRouter)
-
+app.use("/api/search",searchRouter)
 
 app.listen(PORT,()=>{
     console.log(`server is running at http://localhost:${PORT}`);

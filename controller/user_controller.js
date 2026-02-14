@@ -101,7 +101,7 @@ const searchUser= async(req,res)=>{
   }
 }
 
-module.exports = { register, login,searchUser };
+module.exports = { register, login };
 
 
 

@@ -13,7 +13,7 @@ userRouter.post("/login",login);
 
 //search route..
 
-userRouter.get("/search",searchUser)
+//userRouter.get("/search",searchUser)
 
   
 module.exports=userRouter
