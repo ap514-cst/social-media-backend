@@ -4,6 +4,6 @@ const { searchUser } = require("../controller/search_controller");
 const searchRouter=express.Router();
 
 
-searchRouter.get("/search", searchUser)
+searchRouter.get("/searchUsers", searchUser)
 
 module.exports=searchRouter
